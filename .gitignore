@@ -1,0 +1,14 @@
+.env
+.env.local
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+node_modules/
+dist/
+build/
+staticfiles/
+*.sqlite3
+.DS_Store
+Thumbs.db
