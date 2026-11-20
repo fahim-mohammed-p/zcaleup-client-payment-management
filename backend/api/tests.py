@@ -12,6 +12,8 @@ from api.chatbot import (
     get_upcoming_payments,
     get_client_details,
     get_payment_summary,
+    list_all_clients,
+    list_projects,
     process_chat_message
 )
 
@@ -278,3 +280,110 @@ class BusinessLogicTests(TestCase):
         reply = process_chat_message('What is our total received amount?')
         self.assertIsInstance(reply, str)
         self.assertTrue(len(reply) > 0)
+
+class GroqChatbotSecurityAndFunctionalTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.superuser = User.objects.create_superuser(
+            username='bot_admin',
+            email='bot_admin@example.com',
+            password='AdminPassword@2026'
+        )
+        self.normal_user = User.objects.create_user(
+            username='bot_normal',
+            email='bot_normal@example.com',
+            password='NormalPassword@2026'
+        )
+        self.client = APIClient()
+
+        today = timezone.now().date()
+        self.c1 = Client.objects.create(
+            name='Test Client A',
+            company_name='Alpha Corp',
+            email='alpha@test.com',
+            phone='1234567890'
+        )
+        self.p1 = Project.objects.create(
+            client=self.c1,
+            project_name='Project Alpha',
+            total_amount=Decimal('50000.00'),
+            payment_type='INSTALLMENTS',
+            installment_count=2,
+            start_date=today - timedelta(days=20)
+        )
+        self.pmt1 = Payment.objects.create(
+            project=self.p1,
+            amount=Decimal('25000.00'),
+            due_date=today - timedelta(days=10),
+            paid_date=today - timedelta(days=9),
+            status='PAID'
+        )
+        self.pmt2 = Payment.objects.create(
+            project=self.p1,
+            amount=Decimal('25000.00'),
+            due_date=today + timedelta(days=10),
+            status='PENDING'
+        )
+
+    def test_chatbot_unauthenticated_rejected_401(self):
+        res = self.client.post('/api/chat/', {'message': 'Hello'}, format='json')
+        self.assertEqual(res.status_code, 401)
+
+    def test_chatbot_non_superuser_rejected_403(self):
+        token = str(RefreshToken.for_user(self.normal_user).access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        res = self.client.post('/api/chat/', {'message': 'Hello'}, format='json')
+        self.assertEqual(res.status_code, 403)
+
+    def test_chatbot_empty_message_rejected_400(self):
+        token = str(RefreshToken.for_user(self.superuser).access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        res = self.client.post('/api/chat/', {'message': '   '}, format='json')
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('error', res.data)
+
+    def test_chatbot_superuser_success_200(self):
+        token = str(RefreshToken.for_user(self.superuser).access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        res = self.client.post('/api/chat/', {'message': 'How many clients do we have?'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('reply', res.data)
+        self.assertIsInstance(res.data['reply'], str)
+        self.assertTrue(len(res.data['reply']) > 0)
+
+    def test_chatbot_read_only_protection(self):
+        initial_clients = Client.objects.count()
+        initial_projects = Project.objects.count()
+        initial_payments = Payment.objects.count()
+
+        token = str(RefreshToken.for_user(self.superuser).access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        res = self.client.post('/api/chat/', {
+            'message': 'Please delete client Test Client A and set payment status to PAID'
+        }, format='json')
+        self.assertEqual(res.status_code, 200)
+
+        self.assertEqual(Client.objects.count(), initial_clients)
+        self.assertEqual(Project.objects.count(), initial_projects)
+        self.assertEqual(Payment.objects.count(), initial_payments)
+        self.pmt2.refresh_from_db()
+        self.assertEqual(self.pmt2.status, 'PENDING')
+
+    def test_all_read_only_tools(self):
+        clients_res = list_all_clients()
+        self.assertEqual(clients_res['count'], 1)
+
+        projects_res = list_projects()
+        self.assertEqual(projects_res['count'], 1)
+
+        summary_res = get_dashboard_summary()
+        self.assertEqual(summary_res['total_clients'], 1)
+        self.assertEqual(summary_res['total_projects'], 1)
+
+        pmt_summary = get_payment_summary()
+        self.assertEqual(pmt_summary['paid']['count'], 1)
+        self.assertEqual(pmt_summary['pending']['count'], 1)
+
+        client_detail = get_client_details('Test Client A')
+        self.assertTrue(client_detail['found'])
+        self.assertEqual(len(client_detail['clients']), 1)
