@@ -91,7 +91,7 @@ export const Chatbot = () => {
       {isOpen && (
         <div className="chat-panel">
           <div
-            className="p-3 border-bottom d-flex align-items-center justify-content-between"
+            className="p-3 border-bottom d-flex align-items-center justify-content-between flex-shrink-0"
             style={{ backgroundColor: '#ffffff' }}
           >
             <div className="d-flex align-items-center gap-2">
@@ -167,7 +167,7 @@ export const Chatbot = () => {
           </div>
 
           {messages.length <= 2 && (
-            <div className="px-3 pt-2 pb-1 d-flex flex-wrap gap-1 bg-white border-top">
+            <div className="px-3 pt-2 pb-1 d-flex flex-wrap gap-1 bg-white border-top flex-shrink-0">
               {quickPrompts.map((q, idx) => (
                 <button
                   key={idx}
@@ -181,29 +181,27 @@ export const Chatbot = () => {
             </div>
           )}
 
-          <div className="p-2.5 bg-white border-top">
+          <div className="chat-composer">
             <form
               onSubmit={(e) => {
                 e.preventDefault()
                 handleSend()
               }}
-              className="d-flex align-items-center gap-2"
+              className="chat-form"
             >
               <input
                 type="text"
-                className="form-control form-control-sm border-0 bg-light"
+                className="form-control form-control-sm border-0 bg-light chat-input"
                 placeholder="Ask about clients, payments, totals..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 disabled={loading}
-                style={{ borderRadius: 10, fontSize: '0.85rem', padding: '0.55rem 0.75rem' }}
               />
               <button
                 type="submit"
-                className="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                className="btn btn-primary btn-sm chat-send-btn"
                 disabled={!inputMessage.trim() || loading}
-                style={{ width: 36, height: 36, borderRadius: 10, padding: 0 }}
                 aria-label="Send message"
               >
                 {loading ? <Loader2 size={16} className="spinner-border spinner-border-sm" /> : <Send size={16} />}
