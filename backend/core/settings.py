@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
@@ -8,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / '.env')
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-zcaleup-payment-system-key-2026-development')
+SECRET_KEY = os.getenv('SECRET_KEY') or 'django-insecure-zcaleup-payment-system-key-2026-development'
 
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes', 't')
 
@@ -60,8 +61,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+from django.core.exceptions import ImproperlyConfigured
+
 database_url = os.getenv('DATABASE_URL', '').strip()
-if database_url:
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
+elif database_url and not database_url.startswith('sqlite'):
     DATABASES = {
         'default': dj_database_url.config(
             default=database_url,
@@ -71,10 +84,11 @@ if database_url:
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+        'default': dj_database_url.config(
+            default=database_url or 'postgresql://DB_USERNAME:DB_PASSWORD@localhost:5432/DB_NAME',
+            conn_max_age=600,
+            conn_health_checks=True
+        )
     }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -100,7 +114,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'api.permissions.IsSuperuser',
     ),
 }
 

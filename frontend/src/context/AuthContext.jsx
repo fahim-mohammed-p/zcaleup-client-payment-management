@@ -12,6 +12,9 @@ export const AuthProvider = ({ children }) => {
   const fetchUserProfile = async () => {
     try {
       const res = await api.get('/api/auth/user/')
+      if (!res.data?.is_superuser) {
+        throw new Error('Access denied: superuser privileges required')
+      }
       setUser(res.data)
     } catch {
       setUser(null)
@@ -36,13 +39,17 @@ export const AuthProvider = ({ children }) => {
     const res = await axios.post(`${baseURL}/api/auth/login/`, { username, password })
     const { access, refresh } = res.data
 
-    localStorage.setItem('access_token', access)
-    localStorage.setItem('refresh_token', refresh)
-    setToken(access)
-
     const profileRes = await axios.get(`${baseURL}/api/auth/user/`, {
       headers: { Authorization: `Bearer ${access}` }
     })
+
+    if (!profileRes.data?.is_superuser) {
+      throw new Error('Access denied: superuser privileges required')
+    }
+
+    localStorage.setItem('access_token', access)
+    localStorage.setItem('refresh_token', refresh)
+    setToken(access)
     setUser(profileRes.data)
     return profileRes.data
   }
@@ -59,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         token,
-        isAuthenticated: !!token,
+        isAuthenticated: !!token && !!user?.is_superuser,
         loading,
         login,
         logout

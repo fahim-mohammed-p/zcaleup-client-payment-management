@@ -8,11 +8,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import Client, Project, Payment
+from .permissions import IsSuperuser
 from .serializers import (
     ClientSerializer,
     ProjectSerializer,
     PaymentSerializer,
     MarkPaidSerializer,
+    SuperuserTokenObtainPairSerializer,
+    SuperuserTokenRefreshSerializer,
 )
 from .chatbot import (
     sync_payment_statuses,
@@ -20,8 +23,14 @@ from .chatbot import (
     process_chat_message,
 )
 
+class SuperuserTokenObtainPairView(TokenObtainPairView):
+    serializer_class = SuperuserTokenObtainPairSerializer
+
+class SuperuserTokenRefreshView(TokenRefreshView):
+    serializer_class = SuperuserTokenRefreshSerializer
+
 class CurrentUserView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsSuperuser]
 
     def get(self, request):
         user = request.user
@@ -36,7 +45,7 @@ class CurrentUserView(APIView):
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all().prefetch_related('projects', 'projects__payments')
     serializer_class = ClientSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsSuperuser]
 
     def get_queryset(self):
         sync_payment_statuses()
@@ -65,7 +74,7 @@ class ClientViewSet(viewsets.ModelViewSet):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all().select_related('client').prefetch_related('payments')
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsSuperuser]
 
     def get_queryset(self):
         sync_payment_statuses()
@@ -85,7 +94,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all().select_related('project', 'project__client')
     serializer_class = PaymentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsSuperuser]
 
     def get_queryset(self):
         sync_payment_statuses()
@@ -163,7 +172,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class DashboardSummaryView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsSuperuser]
 
     def get(self, request):
         sync_payment_statuses()
@@ -220,7 +229,7 @@ class DashboardSummaryView(APIView):
         })
 
 class ChatbotView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsSuperuser]
 
     def post(self, request):
         message = request.data.get('message', '').strip()

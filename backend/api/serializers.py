@@ -1,10 +1,38 @@
 from datetime import date
 from decimal import Decimal
 import calendar
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Client, Project, Payment
+
+class SuperuserTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not self.user or not self.user.is_active or not self.user.is_superuser:
+            raise AuthenticationFailed('Invalid credentials or unauthorized access.')
+        data['user'] = {
+            'id': self.user.id,
+            'username': self.user.username,
+            'email': self.user.email,
+            'is_superuser': self.user.is_superuser,
+        }
+        return data
+
+class SuperuserTokenRefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = RefreshToken(attrs['refresh'])
+        user_id = refresh.payload.get('user_id')
+        User = get_user_model()
+        user = User.objects.filter(id=user_id, is_active=True, is_superuser=True).first()
+        if not user:
+            raise AuthenticationFailed('Invalid token or unauthorized access.')
+        return data
 
 def add_months(source_date, months):
     month = source_date.month - 1 + months

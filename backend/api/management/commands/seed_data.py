@@ -1,35 +1,13 @@
 from datetime import timedelta
 from decimal import Decimal
 from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from api.models import Client, Project, Payment
 
 class Command(BaseCommand):
-    help = 'Seeds initial admin user and sample client/project/payment data'
-
-    def add_arguments(self, parser):
-        parser.add_argument('--username', default='admin')
-        parser.add_argument('--password', default='adminpassword123')
-        parser.add_argument('--email', default='admin@example.com')
+    help = 'Seeds sample client, project, and payment records if database is empty'
 
     def handle(self, *args, **options):
-        User = get_user_model()
-        username = options['username']
-        password = options['password']
-        email = options['email']
-
-        admin_user, created = User.objects.get_or_create(username=username, defaults={'email': email, 'is_staff': True, 'is_superuser': True})
-        admin_user.set_password(password)
-        admin_user.is_staff = True
-        admin_user.is_superuser = True
-        admin_user.save()
-
-        if created:
-            self.stdout.write(self.style.SUCCESS(f"Created admin user: {username}"))
-        else:
-            self.stdout.write(self.style.SUCCESS(f"Updated admin user: {username}"))
-
         if Client.objects.exists():
             self.stdout.write("Database already contains clients. Skipping sample client data.")
             return
@@ -203,4 +181,4 @@ class Command(BaseCommand):
             status='PENDING'
         )
 
-        self.stdout.write(self.style.SUCCESS("Successfully seeded 5 initial clients with projects and payments."))
+        self.stdout.write(self.style.SUCCESS("Successfully seeded sample clients, projects, and payments."))

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BriefcaseBusiness, Lock, User, AlertCircle, ArrowRight } from 'lucide-react'
+import { BriefcaseBusiness, Lock, User, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export const Login = () => {
-  const [username, setUsername] = useState('admin')
-  const [password, setPassword] = useState('adminpassword123')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
@@ -13,16 +14,18 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!username.trim() || !password.trim()) return
+
     setError('')
     setLoading(true)
 
     try {
-      await login(username, password)
+      await login(username.trim(), password)
       navigate('/', { replace: true })
     } catch (err) {
       setError(
         err.response?.data?.detail ||
-        'Invalid username or password. Please try again.'
+        'Invalid credentials or unauthorized access.'
       )
     } finally {
       setLoading(false)
@@ -74,9 +77,11 @@ export const Login = () => {
               <input
                 type="text"
                 className="form-control border-start-0 ps-0"
-                placeholder="Enter admin username"
+                placeholder="Enter username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                disabled={loading}
                 required
               />
             </div>
@@ -89,30 +94,36 @@ export const Login = () => {
                 <Lock size={16} />
               </span>
               <input
-                type="password"
-                className="form-control border-start-0 ps-0"
+                type={showPassword ? 'text' : 'password'}
+                className="form-control border-start-0 border-end-0 ps-0"
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                disabled={loading}
                 required
               />
+              <button
+                type="button"
+                className="input-group-text bg-light border-start-0 text-muted"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex="-1"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
           </div>
 
           <button
             type="submit"
             className="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 py-2"
-            disabled={loading}
+            disabled={loading || !username.trim() || !password.trim()}
           >
             <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
             {!loading && <ArrowRight size={16} />}
           </button>
         </form>
-
-        <div className="mt-4 pt-3 border-top text-center">
-          <span className="text-muted small">Default Admin Credentials: </span>
-          <code className="text-dark bg-light px-2 py-1 rounded small">admin / adminpassword123</code>
-        </div>
       </div>
     </div>
   )
