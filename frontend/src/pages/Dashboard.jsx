@@ -129,10 +129,10 @@ export const Dashboard = () => {
   ]
 
   return (
-    <div className="d-flex flex-column gap-4">
-      <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3">
+    <div className="d-flex flex-column gap-3.5">
+      <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
         <div>
-          <h2 className="h4 fw-bold text-dark mb-1">Financial Overview</h2>
+          <h2 className="h5 fw-bold text-dark mb-0">Financial Overview</h2>
           <p className="text-muted small mb-0">Real-time metrics, payment tracking, and scheduled collections</p>
         </div>
         <button
@@ -146,61 +146,56 @@ export const Dashboard = () => {
       </div>
 
       {error && (
-        <div className="alert alert-danger py-2 px-3 mb-0" style={{ fontSize: '0.875rem' }}>
+        <div className="alert alert-danger py-2 px-3 mb-0" style={{ fontSize: '0.85rem' }}>
           {error}
         </div>
       )}
 
-      <div className="row g-3">
+      <div className="stats-grid">
         {summaryCards.map((card, idx) => {
           const Icon = card.icon
           return (
-            <div key={idx} className={idx < 4 ? 'col-12 col-sm-6 col-xl-3' : 'col-12 col-sm-6 col-xl-4'}>
-              <div
-                className="card p-3.5 h-100 summary-card bg-white d-flex flex-column justify-content-between"
-                onClick={card.onClick}
-                style={card.isOverdue && card.value > 0 ? { borderColor: '#fecaca', backgroundColor: '#fffafa' } : {}}
-              >
-                <div className="d-flex align-items-center justify-content-between mb-3">
-                  <span className="text-muted fw-semibold" style={{ fontSize: '0.8rem', letterSpacing: '0.02em' }}>
-                    {card.title}
-                  </span>
-                  <div className="summary-icon-box flex-shrink-0" style={{ backgroundColor: card.bgColor, color: card.color }}>
-                    <Icon size={20} />
-                  </div>
+            <div
+              key={idx}
+              className="card summary-card p-3 bg-white d-flex flex-column justify-content-between"
+              onClick={card.onClick}
+              style={card.isOverdue && card.value > 0 ? { borderColor: '#fecaca', backgroundColor: '#fffafa' } : {}}
+            >
+              <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
+                <span className="text-muted fw-semibold text-truncate" style={{ fontSize: '0.76rem', letterSpacing: '0.02em' }}>
+                  {card.title}
+                </span>
+                <div className="summary-icon-box flex-shrink-0" style={{ backgroundColor: card.bgColor, color: card.color }}>
+                  <Icon size={17} />
                 </div>
-                <div className="mt-auto">
-                  <div className="d-flex align-items-baseline justify-content-between">
-                    <div className="h3 fw-bold text-dark mb-0">{card.value}</div>
-                    <ArrowUpRight size={18} className="text-muted flex-shrink-0 ms-2" />
+              </div>
+              <div className="mt-auto">
+                <div className="d-flex align-items-baseline justify-content-between gap-1">
+                  <div className="fw-bold text-dark text-truncate" style={{ fontSize: '1.35rem', lineHeight: 1.2 }}>
+                    {card.value}
                   </div>
-                  <div style={{ minHeight: '1.25rem', marginTop: '0.35rem' }}>
-                    {card.subValue ? (
-                      <span className="text-danger fw-semibold" style={{ fontSize: '0.75rem' }}>
-                        Outstanding: {card.subValue}
-                      </span>
-                    ) : (
-                      <span className="text-muted" style={{ fontSize: '0.75rem' }}>
-                        &nbsp;
-                      </span>
-                    )}
-                  </div>
+                  <ArrowUpRight size={16} className="text-muted flex-shrink-0" />
                 </div>
+                {card.subValue && (
+                  <div className="text-danger fw-semibold text-truncate mt-0.5" style={{ fontSize: '0.72rem', lineHeight: 1 }}>
+                    Due: {card.subValue}
+                  </div>
+                )}
               </div>
             </div>
           )
         })}
       </div>
 
-      <div className="card p-4 bg-white">
-        <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-1 mb-3">
+      <div className="card p-3 p-sm-3.5 bg-white">
+        <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-1 mb-2">
           <div>
-            <h3 className="h6 fw-bold text-dark mb-1">Payment Status Overview</h3>
-            <p className="text-muted small mb-0">Breakdown of collected, pending, and overdue capital</p>
+            <h3 className="fw-bold text-dark mb-0" style={{ fontSize: '0.95rem' }}>Payment Status Overview</h3>
+            <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>Breakdown of collected, pending, and overdue capital</p>
           </div>
         </div>
 
-        <div className="progress mb-4" style={{ height: 10, borderRadius: 6, backgroundColor: '#f1f5f9' }}>
+        <div className="progress my-2.5" style={{ height: 8, borderRadius: 4, backgroundColor: '#f1f5f9', width: '100%' }}>
           <div
             className="progress-bar bg-success"
             role="progressbar"
@@ -221,163 +216,171 @@ export const Dashboard = () => {
           />
         </div>
 
-        <div className="row g-3 text-center">
+        <div className="row g-2.5 text-center mt-0.5">
           <div className="col-12 col-md-4">
-            <div className="p-3 rounded-3 d-flex flex-column align-items-center justify-content-center h-100" style={{ backgroundColor: '#ecfdf5', border: '1px solid #d1fae5' }}>
-              <div className="d-flex align-items-center justify-content-center gap-1.5 text-success fw-bold small">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }} />
+            <div className="p-2.5 rounded-3 d-flex flex-column align-items-center justify-content-center h-100" style={{ backgroundColor: '#ecfdf5', border: '1px solid #d1fae5' }}>
+              <div className="d-flex align-items-center justify-content-center gap-1.5 text-success fw-semibold" style={{ fontSize: '0.78rem' }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }} />
                 Paid ({statusOverview.paid?.percentage || 0}%)
               </div>
-              <div className="h4 fw-bold text-dark my-1.5">
+              <div className="fw-bold text-dark my-1" style={{ fontSize: '1.2rem', lineHeight: 1.2 }}>
                 ₹{Number(statusOverview.paid?.amount || 0).toLocaleString()}
               </div>
-              <div className="text-muted small">{statusOverview.paid?.count || 0} payments</div>
+              <div className="text-muted" style={{ fontSize: '0.72rem' }}>{statusOverview.paid?.count || 0} payments</div>
             </div>
           </div>
           <div className="col-12 col-md-4">
-            <div className="p-3 rounded-3 d-flex flex-column align-items-center justify-content-center h-100" style={{ backgroundColor: '#fffbeb', border: '1px solid #fef3c7' }}>
-              <div className="d-flex align-items-center justify-content-center gap-1.5 text-warning fw-bold small">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#f59e0b', flexShrink: 0 }} />
+            <div className="p-2.5 rounded-3 d-flex flex-column align-items-center justify-content-center h-100" style={{ backgroundColor: '#fffbeb', border: '1px solid #fef3c7' }}>
+              <div className="d-flex align-items-center justify-content-center gap-1.5 text-warning fw-semibold" style={{ fontSize: '0.78rem' }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#f59e0b', flexShrink: 0 }} />
                 Pending ({statusOverview.pending?.percentage || 0}%)
               </div>
-              <div className="h4 fw-bold text-dark my-1.5">
+              <div className="fw-bold text-dark my-1" style={{ fontSize: '1.2rem', lineHeight: 1.2 }}>
                 ₹{Number(statusOverview.pending?.amount || 0).toLocaleString()}
               </div>
-              <div className="text-muted small">{statusOverview.pending?.count || 0} payments</div>
+              <div className="text-muted" style={{ fontSize: '0.72rem' }}>{statusOverview.pending?.count || 0} payments</div>
             </div>
           </div>
           <div className="col-12 col-md-4">
-            <div className="p-3 rounded-3 d-flex flex-column align-items-center justify-content-center h-100" style={{ backgroundColor: '#fef2f2', border: '1px solid #fee2e2' }}>
-              <div className="d-flex align-items-center justify-content-center gap-1.5 text-danger fw-bold small">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#ef4444', flexShrink: 0 }} />
+            <div className="p-2.5 rounded-3 d-flex flex-column align-items-center justify-content-center h-100" style={{ backgroundColor: '#fef2f2', border: '1px solid #fee2e2' }}>
+              <div className="d-flex align-items-center justify-content-center gap-1.5 text-danger fw-semibold" style={{ fontSize: '0.78rem' }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#ef4444', flexShrink: 0 }} />
                 Overdue ({statusOverview.overdue?.percentage || 0}%)
               </div>
-              <div className="h4 fw-bold text-dark my-1.5">
+              <div className="fw-bold text-dark my-1" style={{ fontSize: '1.2rem', lineHeight: 1.2 }}>
                 ₹{Number(statusOverview.overdue?.amount || 0).toLocaleString()}
               </div>
-              <div className="text-muted small">{statusOverview.overdue?.count || 0} payments</div>
+              <div className="text-muted" style={{ fontSize: '0.72rem' }}>{statusOverview.overdue?.count || 0} payments</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="row g-4">
+      <div className="row g-3">
         <div className="col-12 col-lg-6">
-          <div className="card p-4 bg-white h-100 d-flex flex-column">
-            <div className="d-flex align-items-center justify-content-between mb-3">
+          <div className="card p-3 p-sm-3.5 bg-white h-100 d-flex flex-column overflow-hidden">
+            <div className="d-flex align-items-center justify-content-between mb-2.5">
               <div className="d-flex align-items-center gap-2">
-                <AlertTriangle size={18} className="text-danger flex-shrink-0" />
-                <h3 className="h6 fw-bold text-dark mb-0">Overdue Payments</h3>
+                <AlertTriangle size={17} className="text-danger flex-shrink-0" />
+                <h3 className="fw-bold text-dark mb-0" style={{ fontSize: '0.95rem' }}>Overdue Payments</h3>
               </div>
               <button
                 className="btn btn-sm btn-link text-primary text-decoration-none p-0 fw-semibold"
-                style={{ fontSize: '0.8rem' }}
+                style={{ fontSize: '0.78rem' }}
                 onClick={() => navigate('/payments?status=OVERDUE')}
               >
                 View All
               </button>
             </div>
 
-            {data?.overdue_payments?.length > 0 ? (
-              <div className="d-flex flex-column gap-2.5 flex-grow-1">
-                {data.overdue_payments.map((p) => (
+            <div className="d-flex flex-column gap-2 flex-grow-1">
+              {data?.overdue_payments?.length > 0 ? (
+                data.overdue_payments.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-3 border d-flex align-items-center justify-content-between"
-                    style={{ borderColor: '#fecaca', backgroundColor: '#fffafa', minHeight: '68px' }}
+                    className="p-2.5 rounded-3 border d-flex flex-wrap flex-sm-nowrap align-items-center justify-content-between gap-2"
+                    style={{ borderColor: '#fecaca', backgroundColor: '#fffafa' }}
                   >
-                    <div className="flex-grow-1 min-w-0 me-3">
-                      <div className="fw-semibold text-dark text-truncate" style={{ fontSize: '0.875rem' }}>
+                    <div className="min-w-0" style={{ flex: '1 1 170px' }}>
+                      <div className="fw-semibold text-dark text-truncate" style={{ fontSize: '0.84rem' }}>
                         {p.client_name}
                       </div>
-                      <div className="text-muted text-truncate" style={{ fontSize: '0.75rem' }}>
-                        {p.project_name} • Due: <span className="text-danger fw-medium">{p.due_date}</span>
+                      <div className="text-muted text-truncate" style={{ fontSize: '0.74rem' }}>
+                        {p.project_name} <span className="mx-1">•</span> Due: <span className="text-danger fw-semibold">{p.due_date}</span>
                       </div>
                     </div>
-                    <div className="d-flex align-items-center gap-2.5 flex-shrink-0">
-                      <div className="fw-bold text-dark text-end" style={{ fontSize: '0.9rem', minWidth: '80px' }}>
+                    <div className="d-flex align-items-center justify-content-between justify-content-sm-end gap-2 flex-shrink-0 ms-auto">
+                      <div className="fw-bold text-dark text-nowrap text-end" style={{ fontSize: '0.88rem' }}>
                         ₹{Number(p.amount).toLocaleString()}
                       </div>
                       <button
-                        className="btn btn-sm btn-outline-primary py-1 px-2.5 text-nowrap d-inline-flex align-items-center justify-content-center"
-                        style={{ fontSize: '0.75rem', minWidth: '78px' }}
+                        className="btn btn-sm btn-outline-primary py-1 px-2.5 text-nowrap"
+                        style={{ fontSize: '0.75rem', lineHeight: 1.25 }}
                         onClick={() => setSelectedPayment(p)}
                       >
                         Mark Paid
                       </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-5 text-muted small my-auto">No overdue payments. All clients are up to date!</div>
-            )}
+                ))
+              ) : (
+                <div className="d-flex flex-column align-items-center justify-content-center text-center p-4 my-auto text-muted flex-grow-1" style={{ minHeight: '130px' }}>
+                  <CheckCircle size={28} className="text-success mb-1.5 opacity-75" />
+                  <div className="small fw-semibold text-dark">All payments are up to date!</div>
+                  <div style={{ fontSize: '0.75rem' }}>No overdue accounts found.</div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="col-12 col-lg-6">
-          <div className="card p-4 bg-white h-100 d-flex flex-column">
-            <div className="d-flex align-items-center justify-content-between mb-3">
+          <div className="card p-3 p-sm-3.5 bg-white h-100 d-flex flex-column overflow-hidden">
+            <div className="d-flex align-items-center justify-content-between mb-2.5">
               <div className="d-flex align-items-center gap-2">
-                <Clock size={18} className="text-warning flex-shrink-0" />
-                <h3 className="h6 fw-bold text-dark mb-0">Upcoming Payments</h3>
+                <Clock size={17} className="text-warning flex-shrink-0" />
+                <h3 className="fw-bold text-dark mb-0" style={{ fontSize: '0.95rem' }}>Upcoming Payments</h3>
               </div>
               <button
                 className="btn btn-sm btn-link text-primary text-decoration-none p-0 fw-semibold"
-                style={{ fontSize: '0.8rem' }}
+                style={{ fontSize: '0.78rem' }}
                 onClick={() => navigate('/payments?status=PENDING')}
               >
                 View All
               </button>
             </div>
 
-            {data?.upcoming_payments?.length > 0 ? (
-              <div className="d-flex flex-column gap-2.5 flex-grow-1">
-                {data.upcoming_payments.map((p) => (
+            <div className="d-flex flex-column gap-2 flex-grow-1">
+              {data?.upcoming_payments?.length > 0 ? (
+                data.upcoming_payments.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-3 border d-flex align-items-center justify-content-between bg-white"
-                    style={{ borderColor: '#e2e8f0', minHeight: '68px' }}
+                    className="p-2.5 rounded-3 border d-flex flex-wrap flex-sm-nowrap align-items-center justify-content-between gap-2"
+                    style={{ borderColor: '#e2e8f0', backgroundColor: '#ffffff' }}
                   >
-                    <div className="flex-grow-1 min-w-0 me-3">
-                      <div className="fw-semibold text-dark text-truncate" style={{ fontSize: '0.875rem' }}>
+                    <div className="min-w-0" style={{ flex: '1 1 170px' }}>
+                      <div className="fw-semibold text-dark text-truncate" style={{ fontSize: '0.84rem' }}>
                         {p.client_name}
                       </div>
-                      <div className="text-muted text-truncate" style={{ fontSize: '0.75rem' }}>
-                        {p.project_name} • Due: <span className="text-dark fw-medium">{p.due_date}</span>
+                      <div className="text-muted text-truncate" style={{ fontSize: '0.74rem' }}>
+                        {p.project_name} <span className="mx-1">•</span> Due: <span className="text-dark fw-medium">{p.due_date}</span>
                       </div>
                     </div>
-                    <div className="d-flex align-items-center gap-2.5 flex-shrink-0">
-                      <div className="fw-bold text-dark text-end" style={{ fontSize: '0.9rem', minWidth: '80px' }}>
+                    <div className="d-flex align-items-center justify-content-between justify-content-sm-end gap-2 flex-shrink-0 ms-auto">
+                      <div className="fw-bold text-dark text-nowrap text-end" style={{ fontSize: '0.88rem' }}>
                         ₹{Number(p.amount).toLocaleString()}
                       </div>
                       <button
-                        className="btn btn-sm btn-outline-primary py-1 px-2.5 text-nowrap d-inline-flex align-items-center justify-content-center"
-                        style={{ fontSize: '0.75rem', minWidth: '78px' }}
+                        className="btn btn-sm btn-outline-primary py-1 px-2.5 text-nowrap"
+                        style={{ fontSize: '0.75rem', lineHeight: 1.25 }}
                         onClick={() => setSelectedPayment(p)}
                       >
                         Mark Paid
                       </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-5 text-muted small my-auto">No pending payments due in the next 30 days.</div>
-            )}
+                ))
+              ) : (
+                <div className="d-flex flex-column align-items-center justify-content-center text-center p-4 my-auto text-muted flex-grow-1" style={{ minHeight: '130px' }}>
+                  <Clock size={28} className="text-muted mb-1.5 opacity-50" />
+                  <div className="small fw-semibold text-dark">No upcoming payments</div>
+                  <div style={{ fontSize: '0.75rem' }}>No payments due in the next 30 days.</div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="col-12">
-          <div className="card p-4 bg-white">
-            <div className="d-flex align-items-center justify-content-between mb-3">
+          <div className="card p-3 p-sm-3.5 bg-white overflow-hidden">
+            <div className="d-flex align-items-center justify-content-between mb-2.5">
               <div className="d-flex align-items-center gap-2">
-                <CheckCircle size={18} className="text-success flex-shrink-0" />
-                <h3 className="h6 fw-bold text-dark mb-0">Recent Completed Payments</h3>
+                <CheckCircle size={17} className="text-success flex-shrink-0" />
+                <h3 className="fw-bold text-dark mb-0" style={{ fontSize: '0.95rem' }}>Recent Completed Payments</h3>
               </div>
               <button
                 className="btn btn-sm btn-link text-primary text-decoration-none p-0 fw-semibold"
-                style={{ fontSize: '0.8rem' }}
+                style={{ fontSize: '0.78rem' }}
                 onClick={() => navigate('/payments?status=PAID')}
               >
                 View All
@@ -386,15 +389,15 @@ export const Dashboard = () => {
 
             {data?.recent_payments?.length > 0 ? (
               <div className="table-responsive">
-                <table className="table table-hover align-middle mb-0">
+                <table className="table table-hover table-compact align-middle mb-0">
                   <thead>
                     <tr>
-                      <th style={{ minWidth: '160px' }}>Client</th>
-                      <th style={{ minWidth: '180px' }}>Project</th>
-                      <th className="text-end" style={{ minWidth: '120px' }}>Amount</th>
-                      <th style={{ minWidth: '120px' }}>Paid Date</th>
-                      <th style={{ minWidth: '150px' }}>Reference</th>
-                      <th className="text-center" style={{ minWidth: '100px' }}>Status</th>
+                      <th style={{ minWidth: '150px' }}>Client</th>
+                      <th style={{ minWidth: '170px' }}>Project</th>
+                      <th className="text-end" style={{ minWidth: '110px' }}>Amount</th>
+                      <th style={{ minWidth: '110px' }}>Paid Date</th>
+                      <th style={{ minWidth: '140px' }}>Reference</th>
+                      <th className="text-center" style={{ minWidth: '90px' }}>Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -404,7 +407,7 @@ export const Dashboard = () => {
                         <td className="text-secondary text-nowrap">{p.project_name}</td>
                         <td className="fw-bold text-success text-end text-nowrap">₹{Number(p.amount).toLocaleString()}</td>
                         <td className="text-nowrap">{p.paid_date}</td>
-                        <td className="text-muted text-nowrap font-monospace" style={{ fontSize: '0.8rem' }}>
+                        <td className="text-muted text-nowrap font-monospace" style={{ fontSize: '0.78rem' }}>
                           {p.transaction_reference || 'Direct Deposit'}
                         </td>
                         <td className="text-center text-nowrap">
@@ -416,7 +419,7 @@ export const Dashboard = () => {
                 </table>
               </div>
             ) : (
-              <div className="text-center py-5 text-muted small">No payment records completed yet.</div>
+              <div className="text-center py-4 text-muted small">No payment records completed yet.</div>
             )}
           </div>
         </div>
