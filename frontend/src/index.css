@@ -88,6 +88,7 @@ a {
   background-color: #f8fafc;
   border-bottom: 1px solid var(--border-color);
   padding: 0.85rem 1rem;
+  vertical-align: middle;
 }
 
 .table td {
@@ -238,13 +239,24 @@ a {
 }
 
 .page-container {
-  padding: 1.75rem;
+  padding: 1.75rem 1.75rem 5.5rem 1.75rem;
   flex: 1;
+}
+
+@media (max-width: 767px) {
+  .page-container {
+    padding: 1rem 1rem 5.5rem 1rem;
+  }
+
+  .top-navbar {
+    padding: 0 1rem;
+  }
 }
 
 .summary-card {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   cursor: pointer;
+  min-height: 140px;
 }
 
 .summary-card:hover {
@@ -255,10 +267,13 @@ a {
 .summary-icon-box {
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .floating-chat-btn {
