@@ -35,23 +35,31 @@ export const AuthProvider = ({ children }) => {
   }, [token])
 
   const login = async (username, password) => {
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
-    const res = await axios.post(`${baseURL}/api/auth/login/`, { username, password })
+    const rawBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+    const cleanBaseURL = rawBaseURL.replace(/\/+$/, '')
+    const res = await axios.post(`${cleanBaseURL}/api/auth/login/`, {
+      username: username.trim(),
+      password
+    })
     const { access, refresh } = res.data
 
-    const profileRes = await axios.get(`${baseURL}/api/auth/user/`, {
-      headers: { Authorization: `Bearer ${access}` }
-    })
+    let userData = res.data?.user
+    if (!userData) {
+      const profileRes = await axios.get(`${cleanBaseURL}/api/auth/user/`, {
+        headers: { Authorization: `Bearer ${access}` }
+      })
+      userData = profileRes.data
+    }
 
-    if (!profileRes.data?.is_superuser) {
+    if (!userData?.is_superuser) {
       throw new Error('Access denied: superuser privileges required')
     }
 
     localStorage.setItem('access_token', access)
     localStorage.setItem('refresh_token', refresh)
     setToken(access)
-    setUser(profileRes.data)
-    return profileRes.data
+    setUser(userData)
+    return userData
   }
 
   const logout = () => {

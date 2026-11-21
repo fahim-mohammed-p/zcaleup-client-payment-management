@@ -25,6 +25,7 @@ export const Login = () => {
     } catch (err) {
       setError(
         err.response?.data?.detail ||
+        err.message ||
         'Invalid credentials or unauthorized access.'
       )
     } finally {

@@ -11,7 +11,24 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Client, Project, Payment
 
 class SuperuserTokenObtainPairSerializer(TokenObtainPairSerializer):
+    default_error_messages = {
+        'no_active_account': 'Invalid credentials or unauthorized access.'
+    }
+
     def validate(self, attrs):
+        username = attrs.get(self.username_field, '')
+        if username:
+            username = username.strip()
+            User = get_user_model()
+            if '@' in username:
+                matched_user = User.objects.filter(email__iexact=username).first()
+                if matched_user:
+                    attrs[self.username_field] = matched_user.username
+            else:
+                matched_user = User.objects.filter(username__iexact=username).first()
+                if matched_user:
+                    attrs[self.username_field] = matched_user.username
+
         data = super().validate(attrs)
         if not self.user or not self.user.is_active or not self.user.is_superuser:
             raise AuthenticationFailed('Invalid credentials or unauthorized access.')

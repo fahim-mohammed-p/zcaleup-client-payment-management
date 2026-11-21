@@ -14,7 +14,24 @@ SECRET_KEY = os.getenv('SECRET_KEY') or 'django-insecure-zcaleup-payment-system-
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes', 't')
 
 raw_allowed_hosts = os.getenv('ALLOWED_HOSTS', '*')
-ALLOWED_HOSTS = [h.strip() for h in raw_allowed_hosts.split(',') if h.strip()]
+cleaned_hosts = []
+for h in raw_allowed_hosts.split(','):
+    item = h.strip()
+    if not item:
+        continue
+    if item == '*':
+        cleaned_hosts.append('*')
+        continue
+    if '://' in item:
+        item = item.split('://', 1)[1]
+    item = item.split('/')[0].split(':')[0]
+    if item:
+        cleaned_hosts.append(item)
+ALLOWED_HOSTS = cleaned_hosts or ['*']
+if '.onrender.com' not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('.onrender.com')
+if '.vercel.app' not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('.vercel.app')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -126,11 +143,16 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-raw_cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173')
+raw_cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
 CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_cors_origins.split(',') if o.strip()]
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'True').lower() in ('true', '1', 'yes', 't')
 CORS_ALLOW_CREDENTIALS = True
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+    r"^https://.*\.onrender\.com$",
+    r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
+]
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '').strip()
 GROQ_MODEL = os.getenv('GROQ_MODEL', 'openai/gpt-oss-20b').strip()
