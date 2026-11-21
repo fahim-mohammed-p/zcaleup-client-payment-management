@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import axios from 'axios'
 import api from '../api/axios'
 
 const AuthContext = createContext(null)
@@ -35,9 +34,10 @@ export const AuthProvider = ({ children }) => {
   }, [token])
 
   const login = async (username, password) => {
-    const rawBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
-    const cleanBaseURL = rawBaseURL.replace(/\/+$/, '')
-    const res = await axios.post(`${cleanBaseURL}/api/auth/login/`, {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+
+    const res = await api.post('/api/auth/login/', {
       username: username.trim(),
       password
     })
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
 
     let userData = res.data?.user
     if (!userData) {
-      const profileRes = await axios.get(`${cleanBaseURL}/api/auth/user/`, {
+      const profileRes = await api.get('/api/auth/user/', {
         headers: { Authorization: `Bearer ${access}` }
       })
       userData = profileRes.data

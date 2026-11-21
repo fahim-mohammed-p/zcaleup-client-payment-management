@@ -1,10 +1,20 @@
 import axios from 'axios'
 
-const rawBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
-const cleanBaseURL = rawBaseURL.replace(/\/+$/, '')
+const getBaseURL = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, '')
+  }
+  if (import.meta.env.PROD || import.meta.env.MODE === 'production') {
+    return 'https://zcaleup.onrender.com'
+  }
+  return 'http://127.0.0.1:8000'
+}
+
+export const API_BASE_URL = getBaseURL()
 
 const api = axios.create({
-  baseURL: cleanBaseURL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }
