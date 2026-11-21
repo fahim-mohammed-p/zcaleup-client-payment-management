@@ -142,8 +142,10 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-raw_cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', 'https://zcaleup.vercel.app,http://localhost:5173,http://127.0.0.1:5173')
+raw_cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', 'https://zcaleup-client-payment-management.vercel.app,https://zcaleup.vercel.app,http://localhost:5173,http://127.0.0.1:5173')
 CORS_ALLOWED_ORIGINS = [o.strip().rstrip('/') for o in raw_cors_origins.split(',') if o.strip()]
+if 'https://zcaleup-client-payment-management.vercel.app' not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append('https://zcaleup-client-payment-management.vercel.app')
 if 'https://zcaleup.vercel.app' not in CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS.append('https://zcaleup.vercel.app')
 if 'http://localhost:5173' not in CORS_ALLOWED_ORIGINS:
